@@ -1,9 +1,23 @@
-const http = require('http')
-const fs = require('fs')
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
 
+const PORT = 3031;
+const DIR = './'; 
 const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'content-type': 'text/html' })
-  fs.createReadStream('index.html').pipe(res)
-})
+  const filePath = path.join(DIR, req.url === '/' ? 'index.html' : req.url);
+  
+  fs.readFile(filePath, (err, data) => {
+    if (err) {
+      res.writeHead(404);
+      res.end('404 Not Found');
+      return;
+    }
+    res.writeHead(200);
+    res.end(data);
+  });
+});
 
-server.listen(process.env.PORT || 3031)
+server.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}/`);
+});
